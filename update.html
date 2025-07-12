@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مافيا - لعبة التكتيك والخداع</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap');
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #1a202c; /* Deep charcoal */
+            color: #e2e8f0; /* Off-white for text */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container-bg {
+            background-color: #2d3748; /* Darker gray for panels */
+            border-radius: 16px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            width: 100%;
+            max-width: 700px; /* Increased max-width for better layout */
+            min-height: 700px; /* Ensure enough height for content */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .btn-primary {
+            background-color: #e53e3e; /* Red-600 */
+            color: white;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            padding: 14px 24px;
+            border-radius: 10px;
+            font-size: 1.25rem; /* text-xl */
+            width: 100%;
+        }
+        .btn-primary:hover {
+            background-color: #c53030; /* Darker red */
+        }
+        .btn-secondary {
+            background-color: #3182ce; /* Blue-600 */
+            color: white;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 1.125rem; /* text-lg */
+            width: 100%;
+        }
+        .btn-secondary:hover {
+            background-color: #2b6cb0; /* Darker blue */
+        }
+        .input-field {
+            background-color: #4a5568; /* Gray-700 */
+            border: 1px solid #2d3748;
+            color: #e2e8f0;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1.125rem; /* text-lg */
+            text-align: center;
+        }
+        .player-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px; /* space between input and button */
+        }
+        .remove-player-btn {
+            background-color: #dc2626; /* Red-600 */
+            color: white;
+            border-radius: 50%; /* Make it circular */
+            width: 32px; /* Fixed width */
+            height: 32px; /* Fixed height */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.25rem;
+            line-height: 1; /* Adjust line height for perfect centering */
+            cursor: pointer;
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+        .remove-player-btn:hover {
+            background-color: #b91c1c; /* Darker red */
+        }
+        .icon-large {
+            width: 96px; /* w-24 */
+            height: 96px; /* h-24 */
+        }
+        .player-status-card {
+            background-color: #4a5568;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* To push button to the right */
+        }
+        .player-status-card.selected {
+            border: 2px solid #63b3ed;
+            background-color: #3e5c76;
+        }
+        .player-status-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .player-status-alive {
+            border: 2px solid #2f855a; /* Green-700 */
+        }
+        .player-status-dead {
+            border: 2px solid #c53030; /* Red-700 */
+            opacity: 0.7;
+            text-decoration: line-through;
+        }
+        .timer-display {
+            background-color: #1a202c;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: 'monospace';
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="container-bg">
+
+        <div id="start-screen" class="w-full text-center flex flex-col justify-center items-center h-full">
+            <h1 class="text-6xl font-extrabold mb-6 text-red-500 tracking-wide drop-shadow-lg">مافيا</h1>
+            <p class="text-2xl mb-8 font-semibold text-gray-300">لعبة التكتيك والخداع (نسخة محلية)</p>
+            
+            <div id="player-names-container" class="mb-8 w-full">
+                <label class="block text-xl font-bold mb-4 text-blue-300">أسماء اللاعبين (5-15):</label>
+                <div class="space-y-3 mb-4 max-h-64 overflow-y-auto" id="player-inputs-list">
+                    <div class="player-input-row">
+                        <input type="text" placeholder="اسم اللاعب 1" class="player-name w-full input-field focus:ring-blue-500">
+                    </div>
+                    <div class="player-input-row">
+                        <input type="text" placeholder="اسم اللاعب 2" class="player-name w-full input-field">
+                    </div>
+                    <div class="player-input-row">
+                        <input type="text" placeholder="اسم اللاعب 3" class="player-name w-full input-field">
+                    </div>
+                    <div class="player-input-row">
+                        <input type="text" placeholder="اسم اللاعب 4" class="player-name w-full input-field">
+                    </div>
+                    <div class="player-input-row">
+                        <input type="text" placeholder="اسم اللاعب 5" class="player-name w-full input-field">
+                    </div>
+                </div>
+                <button id="add-player-btn" class="btn-secondary w-full py-3 mb-4">
+                    إضافة لاعب
+                </button>
+            </div>
+            
+            <div class="mb-8 w-full">
+                <label class="block text-xl font-bold mb-4 text-blue-300">تخصيص الأدوار:</label>
+                <div class="flex flex-wrap gap-6 justify-center text-lg">
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" id="include-detective" checked class="h-5 w-5 text-blue-600 rounded mr-2">
+                        <span class="font-medium text-gray-200">شيخ (محقق)</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" id="include-doctor" checked class="h-5 w-5 text-blue-600 rounded mr-2">
+                        <span class="font-medium text-gray-200">طبيب</span>
+                    </label>
+                </div>
+            </div>
+            
+            <button id="start-game-btn" class="btn-primary mb-4">
+                بدء اللعبة
+            </button>
+            <button id="how-to-play-btn" class="btn-secondary">
+                كيفية اللعب؟
+            </button>
+        </div>
+
+        <div id="how-to-play-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+            <div class="container-bg p-8 max-w-2xl w-full rounded-lg relative min-h-0">
+                <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-100 text-3xl font-bold">
+                    &times;
+                </button>
+                <h2 class="text-3xl font-bold mb-6 text-center text-blue-400">كيف تلعب المافيا؟</h2>
+                <div class="text-lg leading-relaxed text-right space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                    <p>المافيا هي لعبة جماعية تعتمد على **الاستنتاج** و**الخداع**.</p>
+                    <p>الهدف بسيط: **المدنيون** يحاولون كشف المافيا والتخلص منهم، بينما **المافيا** يحاولون القضاء على المدنيين سراً.</p>
+                    <h3 class="text-xl font-bold text-blue-300 mt-6">الأدوار الأساسية:</h3>
+                    <ul class="list-disc pr-6 space-y-2">
+                        <li>**المافيا:** مهمتهم القتل ليلاً والتضليل نهاراً. يفوزون إذا أصبح عددهم مساوياً أو أكبر من عدد المدنيين.</li>
+                        <li>**المدنيون:** ليس لديهم قوى خاصة، ويعتمدون على النقاش والتصويت لكشف المافيا.</li>
+                        <li>**الشيخ (المحقق):** يمكنه التحقيق مع لاعب واحد كل ليلة لمعرفة ما إذا كان مافيا أم لا.</li>
+                        <li>**الطبيب (الحامي):** يمكنه حماية لاعب واحد من القتل كل ليلة. لا يمكنه حماية نفسه مرتين متتاليتين.</li>
+                    </ul>
+                    <h3 class="text-xl font-bold text-blue-300 mt-6">دورة اللعب:</h3>
+                    <ol class="list-decimal pr-6 space-y-2">
+                        <li>**توزيع الأدوار:** تُوزع الأدوار سراً في بداية اللعبة. (سيتم تمرير الجهاز بين اللاعبين).</li>
+                        <li>**الليل:**
+                            <ul class="list-disc pr-6">
+                                <li>تستيقظ المافيا وتختار من تقتل.</li>
+                                <li>يستيقظ الشيخ ويحقق مع لاعب (لا يكرر).</li>
+                                <li>يستيقظ الطبيب ويختار من يحمي (لا يحمي نفسه مرتين متتاليتين).</li>
+                            </ul>
+                        </li>
+                        <li>**النهار:**
+                            <ul class="list-disc pr-6">
+                                <li>يُعلن عن ضحية الليل (إذا وُجدت).</li>
+                                <li>يبدأ النقاش العلني بين اللاعبين.</li>
+                                <li>يتم التصويت سرًا على لاعب واحد يُشتبه به (يمرر الجهاز). اللاعب الذي يحصل على أكبر عدد من الأصوات يخرج.</li>
+                            </ul>
+                        </li>
+                        <li>تتكرر دورة الليل والنهار حتى يفوز أحد الفريقين.</li>
+                    </ol>
+                    <p class="mt-6 font-bold text-yellow-300">تذكر: الصدق مطلوب فقط إذا كنت مدنياً! المافيا يجب أن تكذب وتضلل للبقاء!</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="player-role-reveal-screen" class="hidden w-full text-center flex flex-col justify-center items-center h-full">
+            <h2 class="text-4xl font-bold mb-8 text-blue-300">دور <span id="current-player-name-reveal" class="text-yellow-300"></span></h2>
+            <div id="role-display-card" class="bg-gray-700 p-8 rounded-lg shadow-xl mb-8 flex flex-col items-center justify-center min-h-[300px]">
+                </div>
+            <button id="hide-role-btn" class="btn-primary hidden">
+                أخفِ دوري
+            </button>
+        </div>
+
+        <div id="game-screen" class="hidden w-full flex flex-col justify-between h-full">
+            <div class="bg-gray-700 rounded-lg p-4 mb-6 flex justify-between items-center shadow-md">
+                <div id="game-phase" class="text-2xl font-bold text-blue-300">النهار: النقاش</div>
+                <div id="timer" class="text-3xl font-extrabold text-green-400 timer-display">00:00</div>
+            </div>
+            
+            <div id="game-content" class="bg-gray-700 rounded-lg p-6 mb-6 min-h-[150px] flex flex-col justify-center items-center text-center text-xl shadow-md">
+                </div>
+            
+            <div class="bg-gray-700 rounded-lg p-4 mb-6 shadow-md">
+                <h3 class="text-xl font-bold mb-3 text-blue-300">اللاعبون الأحياء:</h3>
+                <div id="alive-players-list" class="flex flex-wrap gap-3 justify-center">
+                    </div>
+            </div>
+
+            <div id="controls" class="bg-gray-700 rounded-lg p-4 text-center shadow-md">
+                </div>
+        </div>
+
+        <div id="end-screen" class="hidden w-full text-center flex flex-col justify-center items-center h-full">
+            <h2 id="winner-text" class="text-5xl font-extrabold mb-8 text-yellow-400 drop-shadow-lg"></h2>
+            
+            <div id="players-summary" class="bg-gray-700 rounded-lg p-6 mb-8 w-full max-h-[400px] overflow-y-auto shadow-lg">
+                <h3 class="text-2xl font-bold mb-4 text-blue-300">ملخص الأدوار:</h3>
+                </div>
+            
+            <button id="new-game-btn" class="btn-primary">
+                لعبة جديدة
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // حالة اللعبة
+        const gameState = {
+            players: [],
+            roles: [],
+            currentPhase: 'role_reveal', // 'role_reveal', 'day_discussion', 'day_voting', 'night'
+            currentRound: 0, // يبدأ من 0 (ليلة التعريف)
+            gameStarted: false,
+            timer: null,
+            timeLeft: 0,
+            currentPlayerIndex: 0, // لتتبع اللاعب الذي يكشف دوره أو يقوم بإجراء
+            
+            // متغيرات تتبع الأدوار الخاصة
+            lastDetectiveTargetId: null,
+            lastDoctorTargetId: null,
+
+            // متغيرات مرحلة الليل
+            mafiaChoices: [], // [{mafiaId, targetId} ...] اختيارات كل مافيا
+            doctorSavedTargetId: null, // الهدف الذي أنقذه الطبيب
+            detectiveInvestigationResult: null, // نتيجة تحقيق الشيخ
+
+            // متغيرات مرحلة التصويت
+            currentVoteTargetId: null, // اللاعب الذي يتم التصويت عليه حاليًا
+            votesCollected: {}, // لتخزين الأصوات لكل لاعب
+            playersVotedCount: 0, // عدد اللاعبين الذين صوتوا
+            
+            victimThisRound: null, // اللاعب الذي مات في الجولة
+            votedOutPlayerId: null, // اللاعب الذي تم التصويت عليه للخروج
+            mafiaDisagree: false, // لتحديد إذا لم يتفق المافيا على هدف
+        };
+
+        // الأدوار المتاحة وبياناتها
+        const ROLES = {
+            MAFIA: {
+                name: 'مافيا',
+                description: 'أنت من المافيا. هدفك قتل المدنيين ليلاً وتضليلهم نهاراً. تعاون مع رفاقك المافيا.',
+                image: 'https://i.ibb.co/3k5fS4B/mafia-icon.png', // صورة أفضل
+                team: 'mafia',
+                nightAction: true,
+                cardColor: 'bg-red-700'
+            },
+            CIVILIAN: {
+                name: 'مدني',
+                description: 'أنت مواطن بريء. هدفك كشف المافيا من خلال النقاش والتصويت وإخراجهم من اللعبة.',
+                image: 'https://i.ibb.co/JmxpM4G/civilian-icon.png', // صورة أفضل
+                team: 'civilians',
+                nightAction: false,
+                cardColor: 'bg-green-700'
+            },
+            DETECTIVE: {
+                name: 'شيخ (محقق)',
+                description: 'يمكنك التحقيق مع لاعب واحد كل ليلة لمعرفة ما إذا كان مافيا أم لا. لا يمكنك التحقيق مع نفس الشخص ليلتين متتاليتين.',
+                image: 'https://i.ibb.co/2dv23rR/detective-icon.png', // صورة أفضل
+                team: 'civilians',
+                nightAction: true,
+                cardColor: 'bg-blue-700'
+            },
+            DOCTOR: {
+                name: 'طبيب',
+                description: 'يمكنك حماية لاعب واحد من القتل كل ليلة. لا يمكنك حماية نفسك مرتين متتاليتين. سيتم إخبارك إذا نجحت حمايتك.',
+                image: 'https://i.ibb.co/sKq532G/doctor-icon.png', // صورة أفضل
+                team: 'civilians',
+                nightAction: true,
+                cardColor: 'bg-yellow-700'
+            }
+        };
+
+        // عناصر واجهة المستخدم
+        const UI = {
+            startScreen: document.getElementById('start-screen'),
+            howToPlayModal: document.getElementById('how-to-play-modal'),
+            closeModalBtn: document.getElementById('close-modal-btn'),
+            playerRoleRevealScreen: document.getElementById('player-role-reveal-screen'),
+            gameScreen: document.getElementById('game-screen'),
+            endScreen: document.getElementById('end-screen'),
+            playerNamesContainer: document.getElementById('player-names-container'),
+            playerInputsList: document.getElementById('player-inputs-list'), // New
+            addPlayerBtn: document.getElementById('add-player-btn'),
+            includeDetective: document.getElementById('include-detective'),
+            includeDoctor: document.getElementById('include-doctor'),
+            startGameBtn: document.getElementById('start-game-btn'),
+            howToPlayBtn: document.getElementById('how-to-play-btn'),
+            
+            // عناصر شاشة كشف الدور
+            currentPlayerNameReveal: document.getElementById('current-player-name-reveal'),
+            roleDisplayCard: document.getElementById('role-display-card'),
+            revealedRoleName: document.getElementById('revealed-role-name'),
+            revealedRoleImage: document.getElementById('revealed-role-image'),
+            revealedRoleDescription: document.getElementById('revealed-role-description'),
+            revealedRoleTeam: document.getElementById('revealed-role-team'),
+            hideRoleBtn: document.getElementById('hide-role-btn'),
+
+            newGameBtn: document.getElementById('new-game-btn'),
+            gamePhase: document.getElementById('game-phase'),
+            timer: document.getElementById('timer'),
+            gameContent: document.getElementById('game-content'),
+            controls: document.getElementById('controls'),
+            winnerText: document.getElementById('winner-text'),
+            playersSummary: document.getElementById('players-summary'),
+            alivePlayersList: document.getElementById('alive-players-list')
+        };
+
+        // ========== الأحداث ==========
+        UI.addPlayerBtn.addEventListener('click', () => {
+            const currentInputs = document.querySelectorAll('.player-name');
+            if (currentInputs.length >= 15) {
+                alert('لقد وصلت للحد الأقصى من اللاعبين (15)!');
+                return;
+            }
+            const newPlayerRow = document.createElement('div');
+            newPlayerRow.className = 'player-input-row';
+            newPlayerRow.innerHTML = `
+                <input type="text" placeholder="اسم اللاعب ${currentInputs.length + 1}" class="player-name w-full input-field focus:ring-blue-500">
+                <button class="remove-player-btn" title="إزالة اللاعب">&times;</button>
+            `;
+            UI.playerInputsList.appendChild(newPlayerRow);
+            addRemoveButtonListener(newPlayerRow.querySelector('.remove-player-btn'));
+        });
+
+        // Add event listeners for initial remove buttons
+        document.querySelectorAll('.player-input-row .remove-player-btn').forEach(addRemoveButtonListener);
+
+        function addRemoveButtonListener(button) {
+            button.addEventListener('click', (event) => {
+                const playerInputRows = document.querySelectorAll('.player-input-row');
+                if (playerInputRows.length <= 5) { // Ensure at least 5 players remain
+                    alert('يجب أن يكون هناك 5 لاعبين على الأقل.');
+                    return;
+                }
+                event.target.closest('.player-input-row').remove();
+                // Re-number placeholders
+                document.querySelectorAll('.player-name').forEach((input, index) => {
+                    input.placeholder = `اسم اللاعب ${index + 1}`;
+                });
+            });
+        }
+
+        UI.startGameBtn.addEventListener('click', startGame);
+        UI.hideRoleBtn.addEventListener('click', hideRoleAndNextPlayer);
+        UI.newGameBtn.addEventListener('click', () => {
+            resetGame();
+            UI.endScreen.classList.add('hidden');
+            UI.startScreen.classList.remove('hidden');
+            // إعادة تعيين حقول أسماء اللاعبين الافتراضية
+            UI.playerInputsList.innerHTML = `
+                <div class="player-input-row">
+                    <input type="text" placeholder="اسم اللاعب 1" class="player-name w-full input-field">
+                </div>
+                <div class="player-input-row">
+                    <input type="text" placeholder="اسم اللاعب 2" class="player-name w-full input-field">
+                </div>
+                <div class="player-input-row">
+                    <input type="text" placeholder="اسم اللاعب 3" class="player-name w-full input-field">
+                </div>
+                <div class="player-input-row">
+                    <input type="text" placeholder="اسم اللاعب 4" class="player-name w-full input-field">
+                </div>
+                <div class="player-input-row">
+                    <input type="text" placeholder="اسم اللاعب 5" class="player-name w-full input-field">
+                </div>
+            `;
+            // Add listeners to new default buttons
+            document.querySelectorAll('.player-input-row .remove-player-btn').forEach(addRemoveButtonListener);
+
+            UI.includeDetective.checked = true;
+            UI.includeDoctor.checked = true;
+        });
+
+        UI.howToPlayBtn.addEventListener('click', () => {
+            UI.howToPlayModal.classList.remove('hidden');
+        });
+        UI.closeModalBtn.addEventListener('click', () => {
+            UI.howToPlayModal.classList.add('hidden');
+        });
+
+        // ========== وظائف اللعبة الأساسية ==========
+
+        // بدء اللعبة - تحضير الأدوار واللاعبين
+        function startGame() {
+            const nameInputs = document.querySelectorAll('.player-name');
+            const playerNames = Array.from(nameInputs)
+                .map(input => input.value.trim())
+                .filter(name => name !== '');
+            
+            const includeDetective = UI.includeDetective.checked;
+            const includeDoctor = UI.includeDoctor.checked;
+            
+            if (playerNames.length < 5 || playerNames.length > 15) {
+                alert('يجب إدخال أسماء لعدد لاعبين بين 5 و15!');
+                return;
+            }
+            
+            createRolesDistribution(playerNames.length, includeDetective, includeDoctor);
+            
+            // تحديث أسماء اللاعبين
+            gameState.players.forEach((player, index) => {
+                player.name = playerNames[index] || `لاعب ${index + 1}`; // fallback name
+            });
+            
+            UI.startScreen.classList.add('hidden');
+            startRoleRevealPhase();
+        }
+
+        // توزيع الأدوار
+        function createRolesDistribution(playerCount, includeDetective, includeDoctor) {
+            gameState.roles = [];
+            
+            // إذا كان عدد اللاعبين > 5 يكون هناك 2 مافيا، إذا كان 5 فقط يكون هناك 1 مافيا
+            const mafiaCount = playerCount > 5 ? 2 : 1;
+            
+            for (let i = 0; i < mafiaCount; i++) {
+                gameState.roles.push(ROLES.MAFIA);
+            }
+            
+            if (includeDetective) gameState.roles.push(ROLES.DETECTIVE);
+            if (includeDoctor) gameState.roles.push(ROLES.DOCTOR);
+            
+            // إضافة المدنيين لملء باقي الأدوار
+            while (gameState.roles.length < playerCount) {
+                gameState.roles.push(ROLES.CIVILIAN);
+            }
+            
+            // خلط الأدوار عشوائياً
+            gameState.roles = shuffleArray(gameState.roles);
+            
+            // إنشاء قائمة اللاعبين وتعيين الأدوار
+            gameState.players = [];
+            for (let i = 0; i < playerCount; i++) {
+                const player = {
+                    id: i + 1,
+                    name: `لاعب ${i + 1}`,
+                    role: gameState.roles[i],
+                    alive: true,
+                    protected: false, // للحماية المؤقتة في الليل
+                    lastProtectedRound: -1, // لتتبع آخر جولة تم فيها حماية نفسه
+                    lastInvestigatedRound: -1, // لتتبع آخر جولة تم فيها التحقيق
+                };
+                gameState.players.push(player);
+            }
+        }
+
+        // ====== مرحلة كشف الأدوار ======
+        function startRoleRevealPhase() {
+            gameState.currentPhase = 'role_reveal';
+            gameState.currentPlayerIndex = 0;
+            showPlayerRevealPrompt();
+        }
+
+        function showPlayerRevealPrompt() {
+            if (gameState.currentPlayerIndex < gameState.players.length) {
+                const player = gameState.players[gameState.currentPlayerIndex];
+                UI.playerRoleRevealScreen.classList.remove('hidden');
+                UI.gameScreen.classList.add('hidden');
+                UI.currentPlayerNameReveal.textContent = player.name;
+                // تأكد أن زر الإخفاء مخفي دائماً في بداية كل كشف دور
+                UI.hideRoleBtn.classList.add('hidden');
+                UI.roleDisplayCard.innerHTML = `
+                    <p class="text-2xl font-bold mb-4 text-gray-300">مرر الجهاز إلى:</p>
+                    <p class="text-5xl font-extrabold text-yellow-400 mb-6">${player.name}</p>
+                    <button id="reveal-my-role-btn" class="btn-primary">
+                        أنا ${player.name}، اكشف دوري!
+                    </button>
+                `;
+                document.getElementById('reveal-my-role-btn').addEventListener('click', () => revealPlayerRole(player));
+
+            } else {
+                // جميع اللاعبين رأوا أدوارهم، ابدأ اللعبة
+                startGameLoop();
+            }
+        }
+
+        function revealPlayerRole(player) {
+            let mafiaTeamInfo = '';
+            if (player.role.team === 'mafia') {
+                const otherMafia = gameState.players.filter(p => p.role.team === 'mafia' && p.id !== player.id);
+                if (otherMafia.length > 0) {
+                    mafiaTeamInfo = `<p class="text-md mt-4 text-red-200">رفاقك في المافيا: ${otherMafia.map(m => m.name).join('، ')}</p>`;
+                } else {
+                    mafiaTeamInfo = `<p class="text-md mt-4 text-red-200">أنت المافيا الوحيد!</p>`;
+                }
+            }
+
+            UI.roleDisplayCard.innerHTML = `
+                <h3 class="text-5xl font-extrabold mb-4 ${player.role.team === 'mafia' ? 'text-red-400' : 'text-green-400'}">${player.role.name}</h3>
+                <img src="${player.role.image}" alt="دور اللاعب" class="icon-large mb-4">
+                <p class="text-lg text-gray-300 max-w-sm">${player.role.description}</p>
+                <p class="text-xl font-bold mt-4 ${player.role.team === 'mafia' ? 'text-red-300' : 'text-blue-300'}">أنت ${player.role.team === 'mafia' ? 'مافيا' : 'مدني'}</p>
+                ${mafiaTeamInfo}
+            `;
+            // Add the hide button back to the card display area
+            const hideBtnContainer = document.createElement('div');
+            hideBtnContainer.className = "mt-6";
+            hideBtnContainer.appendChild(UI.hideRoleBtn);
+            UI.roleDisplayCard.appendChild(hideBtnContainer);
+            UI.hideRoleBtn.classList.remove('hidden');
+        }
+
+        function hideRoleAndNextPlayer() {
+            UI.hideRoleBtn.classList.add('hidden'); // إخفاء زر الإخفاء
+            gameState.currentPlayerIndex++;
+            showPlayerRevealPrompt();
+        }
+
+        // حلقة اللعبة الرئيسية - تبدأ بالنهار
+        function startGameLoop() {
+            gameState.gameStarted = true;
+            UI.playerRoleRevealScreen.classList.add('hidden');
+            UI.gameScreen.classList.remove('hidden');
+            startDayPhase();
+        }
+
+        // بدء مرحلة النهار (نقاش)
+        function startDayPhase() {
+            clearInterval(gameState.timer); // تأكد من إيقاف أي مؤقت سابق
+            if (checkGameEnd()) return; // التحقق من نهاية اللعبة قبل بدء مرحلة جديدة
+
+            gameState.currentRound++; 
+            gameState.timeLeft = 180; // 3 دقائق للنقاش
+            
+            let phaseTitle = '';
+            if (gameState.currentRound === 1) { // نهار التعارف
+                phaseTitle = 'نهار التعارف';
+            } else {
+                phaseTitle = `النهار ${gameState.currentRound}: النقاش`;
+            }
+            UI.gamePhase.textContent = phaseTitle;
+            UI.timer.textContent = formatTime(gameState.timeLeft);
+            
+            // إعلان ضحية الليل السابقة
+            let victimMessage = '';
+            if (gameState.currentRound > 1) { // لا يوجد ضحايا في نهار التعارف
+                if (gameState.victimThisRound) {
+                    victimMessage = `<p class="text-2xl font-bold text-red-400 mb-4">${gameState.victimThisRound.name} (${gameState.victimThisRound.role.name}) قد قُتل الليلة الماضية!</p>`;
+                    gameState.victimThisRound = null; // إعادة تعيين الضحية
+                } else if (gameState.mafiaDisagree) {
+                    victimMessage = '<p class="text-2xl font-bold text-yellow-400 mb-4">لم تتفق المافيا على هدف! لم يُقتل أحد هذه الليلة.</p>';
+                    gameState.mafiaDisagree = false;
+                } else {
+                    victimMessage = '<p class="text-2xl font-bold text-green-400 mb-4">ليلة هادئة... لم يقتل أحد!</p>';
+                }
+            } else { // نهار التعارف
+                victimMessage = '<p class="text-2xl font-bold text-blue-400 mb-4">مرحباً بكم في نهار التعارف! تعرفوا على بعضكم البعض وحاولوا فهم الأدوار. تذكروا، لا أحد يُقتل في الليلة الأولى!</p>';
+            }
+            
+            updateGameContent(`${victimMessage}<p class="text-lg">حان وقت النقاش. تبادلوا الشكوك والحجج.</p>`);
+            
+            // دائماً أظهر زر بدء التصويت
+            updateControls('<button id="start-voting-btn" class="btn-secondary">بدء التصويت</button>');
+            document.getElementById('start-voting-btn').addEventListener('click', startVotingPhase);
+            
+            startTimer(startVotingPhase); 
+            updateAlivePlayersList();
+        }
+
+        // بدء مرحلة التصويت
+        function startVotingPhase() {
+            clearInterval(gameState.timer); 
+            if (checkGameEnd()) return;
+
+            gameState.currentPhase = 'day_voting';
+            gameState.timeLeft = 60; // دقيقة واحدة للتصويت
+            UI.gamePhase.textContent = `النهار ${gameState.currentRound}: التصويت`;
+            UI.timer.textContent = formatTime(gameState.timeLeft);
+            gameState.votesCollected = {}; // إعادة تعيين الأصوات
+            gameState.playersVotedCount = 0; // إعادة تعيين عدد المصوتين
+            gameState.currentPlayerIndex = 0; // بدء التصويت من أول لاعب
+            
+            showVotingPrompt();
+            startTimer(processVotingResults); // إذا انتهى الوقت، عالج النتائج تلقائياً
+        }
+
+        function showVotingPrompt() {
+            const alivePlayers = gameState.players.filter(p => p.alive);
+            if (gameState.playersVotedCount < alivePlayers.length) {
+                const currentPlayer = alivePlayers[gameState.playersVotedCount];
+                UI.gameContent.innerHTML = `
+                    <p class="text-2xl font-bold mb-4 text-gray-300">مرر الجهاز إلى:</p>
+                    <p class="text-5xl font-extrabold text-yellow-400 mb-6">${currentPlayer.name}</p>
+                    <button id="start-player-vote-btn" class="btn-primary">
+                        أنا ${currentPlayer.name}، سأصوت الآن!
+                    </button>
+                `;
+                UI.controls.innerHTML = ''; // إخفاء أزرار التحكم مؤقتاً
+                document.getElementById('start-player-vote-btn').addEventListener('click', () => {
+                    displayVotingOptions(currentPlayer);
+                });
+            } else {
+                // جميع اللاعبين صوتوا
+                processVotingResults();
+            }
+        }
+
+        function displayVotingOptions(voter) {
+            const alivePlayers = gameState.players.filter(p => p.alive);
+            let content = `<p class="text-xl mb-4 font-bold">يا ${voter.name}, اختر من ستصوت لإخراجه${gameState.currentRound === 1 ? ' أو اختر تخطي التصويت' : ''}:</p>`;
+            content += '<div class="grid grid-cols-2 gap-4 mb-4">';
+            
+            alivePlayers.forEach(player => {
+                // لا يمكن للاعب التصويت على نفسه
+                const isDisabled = player.id === voter.id;
+                content += `
+                    <button data-player-id="${player.id}" 
+                            class="player-select-btn ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-600'} 
+                            bg-gray-700 p-4 rounded-lg flex flex-col items-center justify-center transition-all duration-200"
+                            ${isDisabled ? 'disabled' : ''}>
+                        <span class="text-2xl font-bold">${player.name}</span>
+                    </button>
+                `;
+            });
+            content += '</div>';
+            // زر تخطي التصويت فقط في النهار الأول
+            if (gameState.currentRound === 1) {
+                content += `<button id="skip-vote-btn" class="btn-secondary w-full mt-2">تخطي التصويت</button>`;
+            }
+            
+            updateGameContent(content);
+            updateControls('<p class="text-lg text-blue-300">اختر صوتك' + (gameState.currentRound === 1 ? ' أو تخطى' : '') + '، ثم مرر الجهاز.</p>');
+
+            document.querySelectorAll('.player-select-btn:not([disabled])').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    recordVote(voter.id, parseInt(btn.dataset.playerId));
+                    UI.gameContent.innerHTML = `<p class="text-2xl font-bold text-green-400">تم تسجيل تصويتك! مرر الجهاز للاعب التالي.</p>`;
+                    UI.controls.innerHTML = `<button id="next-voter-btn" class="btn-primary mt-4">اللاعب التالي</button>`;
+                    document.getElementById('next-voter-btn').addEventListener('click', showVotingPrompt);
+                });
+            });
+            if (gameState.currentRound === 1) {
+                document.getElementById('skip-vote-btn').addEventListener('click', () => {
+                    recordVote(voter.id, null); // null تعني تخطي التصويت
+                    UI.gameContent.innerHTML = `<p class="text-2xl font-bold text-green-400">تم تسجيل تصويتك! مرر الجهاز للاعب التالي.</p>`;
+                    UI.controls.innerHTML = `<button id="next-voter-btn" class="btn-primary mt-4">اللاعب التالي</button>`;
+                    document.getElementById('next-voter-btn').addEventListener('click', showVotingPrompt);
+                });
+            }
+        }
+
+        function recordVote(voterId, targetId) {
+            if (targetId) {
+                gameState.votesCollected[targetId] = (gameState.votesCollected[targetId] || 0) + 1;
+            }
+            gameState.playersVotedCount++;
+        }
+
+        // معالجة نتائج التصويت
+        function processVotingResults() {
+            clearInterval(gameState.timer); 
+            if (checkGameEnd()) return;
+
+            const voteCounts = gameState.votesCollected;
+            let maxVotes = 0;
+            let playersWithMaxVotes = [];
+            let totalVotes = 0;
+            for (const playerId in voteCounts) {
+                const count = voteCounts[playerId];
+                totalVotes += count;
+                if (count > maxVotes) {
+                    maxVotes = count;
+                    playersWithMaxVotes = [parseInt(playerId)];
+                } else if (count === maxVotes && maxVotes > 0) {
+                    playersWithMaxVotes.push(parseInt(playerId));
+                }
+            }
+
+            // قاعدة التعادل أو كل الأصوات تخطي أو لم يصوت أحد
+            if (playersWithMaxVotes.length > 1 || maxVotes === 0) {
+                gameState.votedOutPlayerId = null;
+                updateGameContent('<p class="text-3xl font-bold text-yellow-400 mb-4">لم يتم إخراج أحد هذه الجولة.</p>');
+            } else {
+                gameState.votedOutPlayerId = playersWithMaxVotes[0];
+                const votedOutPlayer = gameState.players.find(p => p.id === gameState.votedOutPlayerId);
+                votedOutPlayer.alive = false; 
+                updateGameContent(`<p class="text-3xl font-bold text-red-400 mb-4">${votedOutPlayer.name} (${votedOutPlayer.role.name}) تم التصويت عليه وإخراجه من اللعبة!</p>`);
+            }
+            
+            updateControls('<button id="next-phase-btn" class="btn-primary">الانتقال لليلة</button>');
+            document.getElementById('next-phase-btn').addEventListener('click', startNightPhase);
+            
+            updateAlivePlayersList();
+            checkGameEnd();
+        }
+
+        // بدء مرحلة الليل
+        function startNightPhase() {
+            clearInterval(gameState.timer);
+            if (checkGameEnd()) return;
+
+            gameState.currentPhase = 'night';
+            gameState.timeLeft = 90; // دقيقة ونصف للمرحلة الليلية
+            UI.gamePhase.textContent = `الليل ${gameState.currentRound -1}`; // الليالي تبدأ من ليلة 1
+            UI.timer.textContent = formatTime(gameState.timeLeft);
+            
+            // إعادة تعيين الحماية للجولة الجديدة
+            gameState.players.forEach(p => p.protected = false);
+            gameState.mafiaChoices = [];
+            gameState.doctorSavedTargetId = null;
+            gameState.detectiveInvestigationResult = null; // إعادة تعيين نتيجة التحقيق
+
+            updateGameContent('<p class="text-2xl font-bold text-blue-300">الجميع ينام... حان وقت الأدوار الخاصة!</p>');
+            
+            // بدء إجراءات الليل لكل لاعب حي بالتسلسل
+            gameState.currentPlayerIndex = 0; // إعادة تعيين مؤشر اللاعبين للأدوار الليلية
+            executeNightActionsSequentially();
+        }
+
+        function executeNightActionsSequentially() {
+            const alivePlayers = gameState.players.filter(p => p.alive);
+            if (gameState.currentPlayerIndex >= alivePlayers.length) {
+                // كل اللاعبين انتهوا من أدوارهم الليلية
+                // شاشة انتظار محايدة قبل النهار الجديد
+                UI.gameContent.innerHTML = `<p class="text-2xl font-bold text-blue-300">انتظر حتى يتم تجهيز النهار الجديد...</p>`;
+                UI.controls.innerHTML = '';
+                setTimeout(() => {
+                    processNightResults();
+                }, 700); // 0.7 ثانية انتظار
+                return;
+            }
+            const player = alivePlayers[gameState.currentPlayerIndex];
+            if (player.role.nightAction) {
+                // صاحب دور ليلي (مافيا/شيخ/طبيب)
+                let roleType = '';
+                if (player.role.team === 'mafia') {
+                    roleType = 'mafia';
+                } else if (player.role.name === ROLES.DETECTIVE.name) {
+                    roleType = 'detective';
+                } else if (player.role.name === ROLES.DOCTOR.name) {
+                    roleType = 'doctor';
+                }
+                // شاشة تمرير الجهاز فقط
+                UI.gameContent.innerHTML = `
+                    <p class="text-2xl font-bold mb-4 text-gray-300">مرر الجهاز إلى:</p>
+                    <p class="text-5xl font-extrabold text-yellow-400 mb-6">${player.name}</p>
+                    <button id="start-night-action-btn" class="btn-primary">أنا ${player.name}، سأقوم بإجرائي!</button>
+                `;
+                UI.controls.innerHTML = '';
+                document.getElementById('start-night-action-btn').addEventListener('click', () => {
+                    if (roleType === 'mafia') {
+                        displayMafiaNightAction(player);
+                    } else {
+                        displayNightActionOptions(player, roleType);
+                    }
+                });
+            } else {
+                // مدني أو دور ليس له إجراء ليلي
+                // أولاً: شاشة تمرير الجهاز فقط
+                UI.gameContent.innerHTML = `
+                    <p class="text-2xl font-bold mb-4 text-gray-300">مرر الجهاز إلى:</p>
+                    <p class="text-5xl font-extrabold text-yellow-400 mb-6">${player.name}</p>
+                    <button id="start-civilian-night-btn" class="btn-primary">أنا ${player.name}، استلمت الجهاز</button>
+                `;
+                UI.controls.innerHTML = '';
+                document.getElementById('start-civilian-night-btn').addEventListener('click', () => {
+                    UI.gameContent.innerHTML = `
+                        <p class="text-xl text-gray-300 mb-6">أنت ${player.role.name}. لا يوجد إجراء ليك هذه الليلة. انتظر حتى الصباح.</p>
+                    `;
+                    UI.controls.innerHTML = `<button id="next-player-night-action-btn" class="btn-primary mt-4">التالي</button>`;
+                    document.getElementById('next-player-night-action-btn').addEventListener('click', () => {
+                        gameState.currentPlayerIndex++;
+                        // إذا كان هذا آخر لاعب، نفذ شاشة الانتظار
+                        if (gameState.currentPlayerIndex >= alivePlayers.length) {
+                            UI.gameContent.innerHTML = `<p class="text-2xl font-bold text-blue-300">انتظر حتى يتم تجهيز النهار الجديد...</p>`;
+                            UI.controls.innerHTML = '';
+                            setTimeout(() => {
+                                processNightResults();
+                            }, 700);
+                        } else {
+                            executeNightActionsSequentially();
+                        }
+                    });
+                });
+            }
+        }
+
+        function showNightActionPrompt(player, roleType) {
+            // لم تعد مستخدمة بهذا الشكل، تم نقل المنطق للأعلى
+        }
+
+        function displayNightActionOptions(player, roleType) {
+            const alivePlayers = gameState.players.filter(p => p.alive);
+            let optionsHTML = '';
+            let actionDescription = '';
+            let selectId = '';
+            let targets = [];
+            
+            if (roleType === 'mafia') {
+                actionDescription = 'يا قائد المافيا، اختر من ستقتلون هذه الليلة:';
+                selectId = 'mafia-target';
+                targets = alivePlayers.filter(p => p.role.team !== 'mafia');
+            } else if (roleType === 'detective') {
+                actionDescription = 'اختر من ستحقق في أمره هذه الليلة:';
+                selectId = 'detective-target';
+                // لا يمكن التحقيق مع النفس ولا مع من تم التحقيق معه في الليلة السابقة
+                targets = alivePlayers.filter(p => p.id !== player.id && p.lastInvestigatedRound !== gameState.currentRound - 1);
+            } else if (roleType === 'doctor') {
+                actionDescription = 'اختر من ستحميه هذه الليلة:';
+                selectId = 'doctor-target';
+                // لا يمكن حماية النفس ليلتين متتاليتين
+                targets = alivePlayers.filter(p => !(p.id === player.id && player.lastProtectedRound === gameState.currentRound - 1));
+            }
+
+            if (targets.length === 0 && roleType !== 'mafia') { // المافيا قد لا يكون لديها أهداف وتفوز
+                optionsHTML = `<p class="text-red-400 text-lg">لا يوجد أهداف متاحة لك هذا الدور.</p>`;
+                if (roleType === 'detective') {
+                    optionsHTML += `<p class="text-sm text-gray-400">لا يمكنك تكرار التحقيق مع نفس الشخص.</p>`;
+                } else if (roleType === 'doctor') {
+                    optionsHTML += `<p class="text-sm text-gray-400">لا يمكنك حماية نفسك مرتين متتاليتين.</p>`;
+                }
+                UI.controls.innerHTML = `<button id="skip-action-btn" class="btn-secondary mt-4">تخطي الإجراء</button>`;
+                document.getElementById('skip-action-btn').addEventListener('click', () => {
+                    gameState.currentPlayerIndex++;
+                    if (gameState.currentPlayerIndex >= alivePlayers.length) {
+                        UI.gameContent.innerHTML = `<p class="text-2xl font-bold text-blue-300">انتظر حتى يتم تجهيز النهار الجديد...</p>`;
+                        UI.controls.innerHTML = '';
+                        setTimeout(() => {
+                            processNightResults();
+                        }, 700);
+                    } else {
+                        executeNightActionsSequentially();
+                    }
+                });
+            } else if (targets.length === 0 && roleType === 'mafia') {
+                // المافيا لا تجد أهداف، يعني المدنيون فازوا
+                endGame('فوز المدنيين! لا توجد أهداف للمافيا.');
+                return;
+            } else {
+                optionsHTML = `<p class="text-xl font-bold mb-4">${actionDescription}</p>
+                    <select id="${selectId}" class="w-full p-3 input-field rounded-lg mb-4">
+                        ${targets.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
+                    </select>
+                    <button id="confirm-action-btn" class="btn-primary">تأكيد</button>
+                `;
+                UI.controls.innerHTML = '';
+                
+                updateGameContent(optionsHTML);
+                document.getElementById('confirm-action-btn').addEventListener('click', () => {
+                    const selectedTargetId = parseInt(document.getElementById(selectId).value);
+                    recordNightAction(player, roleType, selectedTargetId);
+                    
+                    let message = `<p class="text-2xl font-bold text-green-400">تم تسجيل إجراؤك يا ${player.name}!</p>`;
+                    if (roleType === 'detective') {
+                        const investigatedPlayer = gameState.players.find(p => p.id === selectedTargetId);
+                        message += `<p class="text-xl mt-4 font-bold text-center">نتيجة تحقيقك عن ${investigatedPlayer.name}: ${investigatedPlayer.role.team === 'mafia' ? '<span class="text-red-300">هو مافيا!</span>' : '<span class="text-green-300">هو مدني.</span>'}</p>`;
+                    }
+                    UI.gameContent.innerHTML = message;
+                    
+                    UI.controls.innerHTML = `<button id="next-player-night-action-btn" class="btn-primary mt-4">التالي</button>`;
+                    document.getElementById('next-player-night-action-btn').addEventListener('click', () => {
+                        gameState.currentPlayerIndex++;
+                        if (gameState.currentPlayerIndex >= alivePlayers.length) {
+                            UI.gameContent.innerHTML = `<p class="text-2xl font-bold text-blue-300">انتظر حتى يتم تجهيز النهار الجديد...</p>`;
+                            UI.controls.innerHTML = '';
+                            setTimeout(() => {
+                                processNightResults();
+                            }, 700);
+                        } else {
+                            executeNightActionsSequentially();
+                        }
+                    });
+                });
+            }
+        }
+
+        function recordNightAction(player, roleType, targetId) {
+            if (roleType === 'mafia') {
+                gameState.mafiaChoices.push({mafiaId: player.id, targetId});
+            } else if (roleType === 'detective') {
+                gameState.lastDetectiveTargetId = targetId;
+                // سجل آخر جولة تم فيها التحقيق مع هذا الهدف
+                const targetPlayer = gameState.players.find(p => p.id === targetId);
+                if (targetPlayer) targetPlayer.lastInvestigatedRound = gameState.currentRound;
+            } else if (roleType === 'doctor') {
+                gameState.doctorSavedTargetId = targetId;
+                player.lastProtectedRound = gameState.currentRound;
+            }
+        }
+
+        // --- جديد: شاشة اختيار هدف المافيا مع عرض اختيار المافيا الآخر ---
+        function displayMafiaNightAction(player) {
+            const alivePlayers = gameState.players.filter(p => p.alive);
+            const mafiaPlayers = alivePlayers.filter(p => p.role.team === 'mafia');
+            const otherMafia = mafiaPlayers.find(m => m.id !== player.id);
+            const mafiaChoices = gameState.mafiaChoices;
+            let otherChoice = null;
+            if (otherMafia) {
+                otherChoice = mafiaChoices.find(c => c.mafiaId === otherMafia.id);
+            }
+            let infoHTML = '';
+            if (otherMafia) {
+                if (otherChoice) {
+                    const target = alivePlayers.find(p => p.id === otherChoice.targetId);
+                    infoHTML = `<p class="text-md text-blue-300 mb-2">اختيار المافيا الآخر (${otherMafia.name}): <span class="font-bold">${target ? target.name : 'غير معروف'}</span></p>`;
+                } else {
+                    infoHTML = `<p class="text-md text-blue-300 mb-2">بانتظار اختيار المافيا الآخر (${otherMafia.name})...</p>`;
+                }
+            }
+            // قائمة الأهداف (غير المافيا)
+            const targets = alivePlayers.filter(p => p.role.team !== 'mafia');
+            let optionsHTML = `<p class="text-xl font-bold mb-4">اختر من ستقتله هذه الليلة:</p>
+                <select id="mafia-target" class="w-full p-3 input-field rounded-lg mb-4">
+                    ${targets.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
+                </select>
+                <button id="confirm-mafia-action-btn" class="btn-primary">تأكيد</button>
+            `;
+            UI.gameContent.innerHTML = infoHTML + optionsHTML;
+            UI.controls.innerHTML = '';
+            document.getElementById('confirm-mafia-action-btn').addEventListener('click', () => {
+                const selectedTargetId = parseInt(document.getElementById('mafia-target').value);
+                // احفظ اختيار المافيا
+                const idx = gameState.mafiaChoices.findIndex(c => c.mafiaId === player.id);
+                if (idx === -1) {
+                    gameState.mafiaChoices.push({mafiaId: player.id, targetId: selectedTargetId});
+                } else {
+                    gameState.mafiaChoices[idx].targetId = selectedTargetId;
+                }
+                UI.gameContent.innerHTML = `<p class="text-2xl font-bold text-green-400">تم تسجيل اختيارك! مرر الجهاز للاعب التالي.</p>`;
+                UI.controls.innerHTML = `<button id="next-player-night-action-btn" class="btn-primary mt-4">التالي</button>`;
+                document.getElementById('next-player-night-action-btn').addEventListener('click', () => {
+                    gameState.currentPlayerIndex++;
+                    executeNightActionsSequentially();
+                });
+            });
+        }
+
+        // معالجة نتائج الليل النهائية
+        function processNightResults() {
+            clearInterval(gameState.timer); 
+            if (checkGameEnd()) return;
+            // 1. تطبيق الاغتيال (جديد: اتفاق المافيا)
+            gameState.victimThisRound = null;
+            const mafiaChoices = gameState.mafiaChoices;
+            const aliveMafia = gameState.players.filter(p => p.alive && p.role.team === 'mafia');
+            if (aliveMafia.length > 1) {
+                if (mafiaChoices.length === aliveMafia.length) {
+                    // تحقق إذا اتفقوا على نفس الهدف
+                    const allTargets = mafiaChoices.map(c => c.targetId);
+                    const agreed = allTargets.every(t => t === allTargets[0]);
+                    if (agreed) {
+                        const mafiaTarget = gameState.players.find(p => p.id === allTargets[0]);
+                        if (mafiaTarget && gameState.doctorSavedTargetId !== mafiaTarget.id) {
+                            mafiaTarget.alive = false;
+                            gameState.victimThisRound = mafiaTarget;
+                        }
+                    } else {
+                        // لم يتفقوا
+                        gameState.victimThisRound = null;
+                        gameState.mafiaDisagree = true;
+                    }
+                }
+            } else {
+                // مافيا واحدة فقط
+                if (mafiaChoices.length === 1) {
+                    const mafiaTarget = gameState.players.find(p => p.id === mafiaChoices[0].targetId);
+                    if (mafiaTarget && gameState.doctorSavedTargetId !== mafiaTarget.id) {
+                        mafiaTarget.alive = false;
+                        gameState.victimThisRound = mafiaTarget;
+                    }
+                }
+            }
+            
+            // 2. إبلاغ الطبيب بنجاح حمايته
+            if (gameState.doctorSavedTargetId && gameState.doctorSavedTargetId === gameState.mafiaChosenTargetId) {
+                // هذا الجزء سيتم التعامل معه في بداية النهار كرسالة عامة أو خاصة
+            }
+            
+            // 3. مسح الأهداف الليلية
+            gameState.mafiaChoices = [];
+            gameState.mafiaChosenTargetId = null;
+            gameState.doctorSavedTargetId = null;
+            gameState.detectiveInvestigationResult = null; 
+            
+            updateControls('<button id="next-phase-btn" class="btn-primary">الانتقال للنهار الجديد</button>');
+            document.getElementById('next-phase-btn').addEventListener('click', startDayPhase); 
+            
+            checkGameEnd(); 
+        }
+
+        // تحديث قائمة اللاعبين الأحياء
+        function updateAlivePlayersList() {
+            const alivePlayers = gameState.players.filter(p => p.alive);
+            UI.alivePlayersList.innerHTML = '';
+            if (alivePlayers.length === 0) {
+                UI.alivePlayersList.innerHTML = '<p class="text-center text-gray-400">لا يوجد لاعبون أحياء!</p>';
+                return;
+            }
+            alivePlayers.forEach(player => {
+                const playerElement = document.createElement('div');
+                playerElement.className = 'bg-gray-800 p-3 rounded-lg flex items-center shadow-sm';
+                playerElement.innerHTML = `
+                    <img src="${player.role.image}" alt="${player.role.name}" class="w-8 h-8 rounded-full mr-2">
+                    <span class="font-semibold text-lg">${player.name}</span>
+                `;
+                UI.alivePlayersList.appendChild(playerElement);
+            });
+        }
+
+        // التحقق من نهاية اللعبة
+        function checkGameEnd() {
+            const aliveMafia = gameState.players.filter(p => p.alive && p.role.team === 'mafia').length;
+            const aliveCivilians = gameState.players.filter(p => p.alive && p.role.team === 'civilians').length;
+            
+            if (!gameState.gameStarted) return false; 
+
+            if (aliveMafia === 0) { 
+                endGame('فوز المدنيين! لقد قضيتم على جميع المافيا!');
+                return true;
+            } else if (aliveMafia >= aliveCivilians) { 
+                endGame('فوز المافيا! لقد سيطروا على البلدة!');
+                return true;
+            }
+            return false;
+        }
+
+        // إنهاء اللعبة
+        function endGame(message) {
+            gameState.gameStarted = false;
+            clearInterval(gameState.timer);
+            
+            UI.winnerText.textContent = message;
+            UI.gameScreen.classList.add('hidden');
+            UI.endScreen.classList.remove('hidden');
+            
+            // عرض ملخص اللاعبين
+            let summaryHTML = '';
+            
+            gameState.players.forEach(player => {
+                summaryHTML += `
+                    <div class="player-status-card ${player.alive ? 'player-status-alive' : 'player-status-dead'}">
+                        <img src="${player.role.image}" alt="${player.role.name}" class="w-10 h-10 rounded-full mr-3">
+                        <div>
+                            <p class="font-bold text-lg">${player.name}</p>
+                            <p class="text-sm">${player.role.name}</p>
+                            <p class="text-xs text-gray-400">${player.alive ? 'ناجي' : 'ميت'}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            UI.playersSummary.innerHTML = summaryHTML;
+        }
+
+        // بدء المؤقت
+        function startTimer(callbackOnEnd) {
+            clearInterval(gameState.timer);
+            
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                UI.timer.textContent = formatTime(gameState.timeLeft);
+                
+                if (gameState.timeLeft <= 0) {
+                    clearInterval(gameState.timer);
+                    if (callbackOnEnd) {
+                        callbackOnEnd();
+                    }
+                }
+            }, 1000);
+        }
+
+        // تحديث محتوى اللعبة
+        function updateGameContent(content) {
+            UI.gameContent.innerHTML = content;
+        }
+
+        // تحديث عناصر التحكم
+        function updateControls(content) {
+            UI.controls.innerHTML = content;
+        }
+
+        // إعادة تعيين اللعبة لحالة البدء
+        function resetGame() {
+            gameState.players = [];
+            gameState.roles = [];
+            gameState.currentPhase = 'day';
+            gameState.currentRound = 0;
+            gameState.gameStarted = false;
+            clearInterval(gameState.timer);
+            gameState.timeLeft = 0;
+            gameState.currentPlayerIndex = 0;
+            
+            gameState.lastDetectiveTargetId = null;
+            gameState.lastDoctorTargetId = null;
+            gameState.mafiaChoices = [];
+            gameState.mafiaChosenTargetId = null;
+            gameState.doctorSavedTargetId = null;
+            gameState.detectiveInvestigationResult = null;
+
+            gameState.currentVoteTargetId = null;
+            gameState.votesCollected = {};
+            gameState.playersVotedCount = 0;
+            
+            gameState.victimThisRound = null;
+            gameState.votedOutPlayerId = null;
+            gameState.mafiaDisagree = false;
+        }
+
+        // ======= دوال مساعدة =======
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+    </script>
+</body>
+</html>
